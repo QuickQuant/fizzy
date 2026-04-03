@@ -30,6 +30,7 @@ Rails.application.routes.draw do
       resource :subscriptions
       resource :involvement
       resource :publication
+      resource :pipeline_setup, only: :create
       resource :entropy
 
       namespace :columns do
