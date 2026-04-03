@@ -177,6 +177,7 @@ class CardsControllerTest < ActionDispatch::IntegrationTest
 
   test "show as JSON" do
     card = cards(:logo)
+    card.update!(pipeline_metadata: { "card_type" => "task", "wave" => 2 }, metadata_version: 4)
     card.steps.create!(content: "First step")
     card.steps.create!(content: "Second step", completed: true)
 
@@ -186,6 +187,8 @@ class CardsControllerTest < ActionDispatch::IntegrationTest
     assert_equal card.title, @response.parsed_body["title"]
     assert_equal card.closed?, @response.parsed_body["closed"]
     assert_equal card.postponed?, @response.parsed_body["postponed"]
+    assert_equal({ "card_type" => "task", "wave" => 2 }, @response.parsed_body["pipeline_metadata"])
+    assert_equal 4, @response.parsed_body["metadata_version"]
     assert_equal 2, @response.parsed_body["steps"].size
     assert_equal card_comments_url(card), @response.parsed_body["comments_url"]
     assert_equal card_reactions_url(card), @response.parsed_body["reactions_url"]
@@ -249,6 +252,25 @@ class CardsControllerTest < ActionDispatch::IntegrationTest
     card = Card.last
     assert_equal created_time, card.created_at
     assert_equal created_time, card.last_active_at
+  end
+
+  test "create as JSON with pipeline_metadata" do
+    assert_difference -> { Card.count }, +1 do
+      post board_cards_path(boards(:writebook)),
+        params: {
+          card: {
+            title: "Card with metadata",
+            pipeline_metadata: { card_type: "task", wave: 2 }
+          }
+        },
+        as: :json
+      assert_response :created
+    end
+
+    card = Card.last
+    assert_equal({ "card_type" => "task", "wave" => 2 }, card.pipeline_metadata)
+    assert_equal({ "card_type" => "task", "wave" => 2 }, @response.parsed_body["pipeline_metadata"])
+    assert_equal 0, @response.parsed_body["metadata_version"]
   end
 
   test "update as JSON with custom last_active_at" do

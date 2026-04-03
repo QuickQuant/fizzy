@@ -80,6 +80,7 @@ Rails.application.routes.draw do
       resource :column
       resource :goldness
       resource :image
+      resource :metadata, only: :update
       resource :not_now
       resource :pin
       resource :publish

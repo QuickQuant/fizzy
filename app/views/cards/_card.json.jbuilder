@@ -6,6 +6,8 @@ json.cache! card do
   json.has_attachments card.has_attachments?
 
   json.tags card.tags.pluck(:title).sort
+  json.pipeline_metadata card.pipeline_metadata
+  json.metadata_version card.metadata_version
 
   json.closed card.closed?
   json.postponed card.postponed?
