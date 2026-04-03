@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_02_18_120000) do
+ActiveRecord::Schema[8.2].define(version: 2026_04_03_103500) do
   create_table "accesses", id: :uuid, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.datetime "accessed_at"
     t.uuid "account_id", null: false
@@ -223,7 +223,13 @@ ActiveRecord::Schema[8.2].define(version: 2026_02_18_120000) do
     t.uuid "creator_id", null: false
     t.date "due_on"
     t.datetime "last_active_at", null: false
+    t.bigint "metadata_version", default: 0, null: false
     t.bigint "number", null: false
+    t.json "pipeline_metadata", default: -> { "(json_object())" }, null: false
+    t.virtual "pipeline_card_type", type: :string, as: "json_unquote(json_extract(`pipeline_metadata`,_utf8mb4'$.card_type'))"
+    t.virtual "pipeline_session_id", type: :string, as: "json_unquote(json_extract(`pipeline_metadata`,_utf8mb4'$.session_id'))"
+    t.virtual "pipeline_parent_session_id", type: :string, as: "json_unquote(json_extract(`pipeline_metadata`,_utf8mb4'$.parent_session_id'))"
+    t.virtual "pipeline_task_id", type: :string, as: "json_unquote(json_extract(`pipeline_metadata`,_utf8mb4'$.task_id'))"
     t.string "status", default: "drafted", null: false
     t.string "title"
     t.datetime "updated_at", null: false
@@ -231,6 +237,10 @@ ActiveRecord::Schema[8.2].define(version: 2026_02_18_120000) do
     t.index ["account_id", "number"], name: "index_cards_on_account_id_and_number", unique: true
     t.index ["board_id"], name: "index_cards_on_board_id"
     t.index ["column_id"], name: "index_cards_on_column_id"
+    t.index ["pipeline_card_type"], name: "index_cards_on_pipeline_card_type"
+    t.index ["pipeline_parent_session_id"], name: "index_cards_on_pipeline_parent_session_id"
+    t.index ["pipeline_session_id"], name: "index_cards_on_pipeline_session_id"
+    t.index ["pipeline_task_id"], name: "index_cards_on_pipeline_task_id"
   end
 
   create_table "closers_filters", id: false, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
