@@ -1,0 +1,32 @@
+<% pipeline_steps = card.steps.reject { |step| step.step_group.blank? } %>
+
+<% if pipeline_steps.any? || card.pipeline_metadata.present? %>
+  <section class="panel padding margin-block" data-testid="pipeline-debug">
+    <% if pipeline_steps.any? %>
+      <div class="margin-block-end" data-testid="pipeline-steps">
+        <h2 class="txt-caps txt-small margin-block-end-half">Pipeline steps</h2>
+
+        <% pipeline_steps.group_by(&:step_group).each do |step_group, grouped_steps| %>
+          <section class="margin-block-end-half" data-testid="pipeline-step-group" data-step-group="<%= step_group %>">
+            <h3 class="txt-small txt-semibold margin-block-end-half"><%= step_group.to_s.humanize %></h3>
+            <ol class="steps txt-small">
+              <% grouped_steps.each do |step| %>
+                <li class="step">
+                  <input type="checkbox" class="checkbox" <%= "checked" if step.completed? %> disabled>
+                  <span class="step__content"><%= step.content %></span>
+                </li>
+              <% end %>
+            </ol>
+          </section>
+        <% end %>
+      </div>
+    <% end %>
+
+    <% if card.pipeline_metadata.present? %>
+      <div data-testid="pipeline-metadata">
+        <h2 class="txt-caps txt-small margin-block-end-half">Pipeline metadata</h2>
+        <pre class="txt-small"><%= JSON.pretty_generate(card.pipeline_metadata) %></pre>
+      </div>
+    <% end %>
+  </section>
+<% end %>

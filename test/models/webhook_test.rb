@@ -9,6 +9,18 @@ class WebhookTest < ActiveSupport::TestCase
     assert webhook.delinquency_tracker.present?
   end
 
+  test "permits card metadata changed action" do
+    webhook = Webhook.new(
+      name: "Metadata",
+      board: boards(:writebook),
+      url: "https://example.com/webhook",
+      subscribed_actions: [ "card_metadata_changed" ]
+    )
+
+    assert webhook.valid?
+    assert_equal [ "card_metadata_changed" ], webhook.subscribed_actions
+  end
+
   test "validates the url" do
     webhook = Webhook.new name: "Test", board: boards(:writebook)
     assert_not webhook.valid?

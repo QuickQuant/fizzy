@@ -61,6 +61,24 @@ class CardsControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "show renders pipeline debug metadata and grouped steps separately" do
+    card = cards(:logo)
+    card.update!(pipeline_metadata: { "card_type" => "task", "wave" => 2 })
+    card.steps.create!(content: "Regular step")
+    card.steps.create!(content: "Acceptance step", step_group: "acceptance_criteria", completed: true)
+    card.steps.create!(content: "Test case", step_group: "test_cases")
+
+    get card_path(card)
+    assert_response :success
+
+    assert_select "[data-testid='regular-steps']", text: /Regular step/
+    assert_select "[data-testid='regular-steps']", text: /Acceptance step/, count: 0
+    assert_select "[data-testid='pipeline-step-group'][data-step-group='acceptance_criteria']", text: /Acceptance step/
+    assert_select "[data-testid='pipeline-step-group'][data-step-group='test_cases']", text: /Test case/
+    assert_select "[data-testid='pipeline-metadata'] pre", text: /"card_type": "task"/
+    assert_select "[data-testid='pipeline-metadata'] pre", text: /"wave": 2/
+  end
+
   test "edit" do
     get edit_card_path(cards(:logo))
     assert_response :success

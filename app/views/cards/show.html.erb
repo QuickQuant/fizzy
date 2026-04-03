@@ -16,6 +16,7 @@
 
 <div data-controller="beacon lightbox" data-beacon-url-value="<%= card_reading_path(@card) %>">
   <%= render "cards/container", card: @card %>
+  <%= render "cards/pipeline_debug", card: @card %>
   <%= render "cards/messages",  card: @card %>
 
   <%= render "layouts/lightbox" do %>

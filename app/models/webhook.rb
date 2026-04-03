@@ -12,6 +12,7 @@ class Webhook < ApplicationRecord
     card_postponed
     card_auto_postponed
     card_board_changed
+    card_metadata_changed
     card_published
     card_reopened
     card_sent_back_to_triage
