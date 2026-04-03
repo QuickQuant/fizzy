@@ -70,34 +70,39 @@ class Cards::StepsControllerTest < ActionDispatch::IntegrationTest
     card = cards(:logo)
 
     assert_difference -> { card.steps.count }, +1 do
-      post card_steps_path(card), params: { step: { content: "New step" } }, as: :json
+      post card_steps_path(card), params: { step: { content: "New step", step_group: "review" } }, as: :json
     end
 
     assert_response :created
     assert_equal card_step_path(card, Step.last, format: :json), @response.headers["Location"]
     assert_equal "New step", @response.parsed_body["content"]
+    assert_equal "review", Step.last.step_group
+    assert_equal "review", @response.parsed_body["step_group"]
   end
 
   test "show as JSON" do
     card = cards(:logo)
-    step = card.steps.create!(content: "Test step")
+    step = card.steps.create!(content: "Test step", step_group: "qa")
 
     get card_step_path(card, step), as: :json
 
     assert_response :success
     assert_equal step.id, @response.parsed_body["id"]
     assert_equal "Test step", @response.parsed_body["content"]
+    assert_equal "qa", @response.parsed_body["step_group"]
   end
 
   test "update as JSON" do
     card = cards(:logo)
     step = card.steps.create!(content: "Original")
 
-    put card_step_path(card, step), params: { step: { content: "Updated" } }, as: :json
+    put card_step_path(card, step), params: { step: { content: "Updated", step_group: "implementation" } }, as: :json
 
     assert_response :success
     assert_equal "Updated", step.reload.content
+    assert_equal "implementation", step.step_group
     assert_equal "Updated", @response.parsed_body["content"]
+    assert_equal "implementation", @response.parsed_body["step_group"]
   end
 
   test "destroy as JSON" do

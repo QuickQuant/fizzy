@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_04_03_103500) do
+ActiveRecord::Schema[8.2].define(version: 2026_04_03_110000) do
   create_table "accesses", id: :uuid, force: :cascade do |t|
     t.datetime "accessed_at"
     t.uuid "account_id", null: false
@@ -507,6 +507,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_04_03_103500) do
     t.boolean "completed", default: false, null: false
     t.text "content", limit: 65535, null: false
     t.datetime "created_at", null: false
+    t.string "step_group"
     t.datetime "updated_at", null: false
     t.index ["account_id"], name: "index_steps_on_account_id"
     t.index ["card_id", "completed"], name: "index_steps_on_card_id_and_completed"

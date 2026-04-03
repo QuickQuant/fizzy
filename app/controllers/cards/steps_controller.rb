@@ -1,5 +1,5 @@
 class Cards::StepsController < ApplicationController
-  wrap_parameters :step, include: %i[ content completed ]
+  wrap_parameters :step, include: %i[ content completed step_group ]
 
   include CardScoped
 
@@ -48,6 +48,6 @@ class Cards::StepsController < ApplicationController
     end
 
     def step_params
-      params.expect(step: [ :content, :completed ])
+      params.expect(step: [ :content, :completed, :step_group ])
     end
 end

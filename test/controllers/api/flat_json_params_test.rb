@@ -146,10 +146,11 @@ class FlatJsonParamsTest < ActionDispatch::IntegrationTest
     card = cards(:logo)
     step = card.steps.create!(content: "Original")
 
-    put card_step_path(card, step), params: { content: "Flat updated" }, as: :json
+    put card_step_path(card, step), params: { content: "Flat updated", step_group: "review" }, as: :json
 
     assert_response :success
     assert_equal "Flat updated", step.reload.content
+    assert_equal "review", step.step_group
   end
 
   test "create card reaction with flat JSON" do
