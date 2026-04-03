@@ -47,6 +47,25 @@ class Card::PipelineMetadataPatchTest < ActiveSupport::TestCase
     )
   end
 
+  # Cross-language merge contract: shared fixtures with Python MCP
+  FIXTURES_PATH = File.join(File.dirname(__FILE__), "..", "..", "fixtures", "metadata_merge_fixtures.json")
+
+  if File.exist?(FIXTURES_PATH)
+    fixtures_data = JSON.parse(File.read(FIXTURES_PATH))
+    fixtures_data["test_cases"].each do |tc|
+      test "merge contract: #{tc['name']}" do
+        card = cards(:logo)
+        card.update!(pipeline_metadata: tc["current"], metadata_version: 10)
+
+        assert card.metadata_patch(tc["patch"], expected_version: 10)
+
+        card.reload
+        assert_equal tc["expected"], card.pipeline_metadata,
+          "Merge mismatch for '#{tc['name']}'"
+      end
+    end
+  end
+
   test "metadata_patch returns false when the version is stale" do
     card = cards(:logo)
     card.update!(pipeline_metadata: { "wave" => 1 }, metadata_version: 3)
