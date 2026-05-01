@@ -93,6 +93,7 @@ Rails.application.routes.draw do
       resources :reactions
 
       resources :assignments
+      put "assignments", to: "assignments#update", as: :replace_assignments
       resource :self_assignment, only: :create
       resources :steps
       resources :taggings

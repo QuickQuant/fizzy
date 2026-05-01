@@ -49,7 +49,6 @@ export default class extends Controller {
 
   focusOnColumn({ target }) {
     if (this.#isDesktop && this.#isCollapsed(target)) {
-      this.#collapseAllExcept(target)
       this.#expand({ column: target })
     }
   }
@@ -78,7 +77,9 @@ export default class extends Controller {
   }
 
   #toggleColumn(column) {
-    this.#collapseAllExcept(column)
+    if (!this.#isDesktop) {
+      this.#collapseAllExcept(column)
+    }
 
     if (this.#isCollapsed(column)) {
       this.#expand({ column })
@@ -138,7 +139,9 @@ export default class extends Controller {
   #restoreColumn(column) {
     const key = this.#localStorageKeyFor(column)
     if (localStorage.getItem(key)) {
-      this.#collapseAllExcept(column)
+      if (!this.#isDesktop) {
+        this.#collapseAllExcept(column)
+      }
       this.#expand({ column, scrollBehavior: isNative() ? "instant" : "smooth" })
     }
   }

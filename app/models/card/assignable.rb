@@ -22,6 +22,26 @@ module Card::Assignable
     assignments.any?
   end
 
+  def replace_assignees(users)
+    transaction do
+      removed_ids = assignees.where.not(id: users).pluck(:id)
+      assignments.where(assignee: removed_ids).delete_all
+
+      added = []
+      users.each do |user|
+        next if assigned_to?(user)
+        assignment = assignments.create assignee: user, assigner: Current.user
+        added << user if assignment.persisted?
+      end
+
+      track_event :unassigned, assignee_ids: removed_ids if removed_ids.any?
+      track_event :assigned, assignee_ids: added.map(&:id) if added.any?
+      added.each { |user| watch_by user }
+    end
+
+    assignees.reload
+  end
+
   private
     def assign(user)
       assignment = assignments.create assignee: user, assigner: Current.user

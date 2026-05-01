@@ -20,4 +20,13 @@ class Cards::AssignmentsController < ApplicationController
       end
     end
   end
+
+  def update
+    users = @board.users.active.where(id: Array(params[:assignee_ids]))
+    resulting = @card.replace_assignees(users)
+
+    respond_to do |format|
+      format.json { render json: resulting.map { |u| { id: u.id, name: u.name } } }
+    end
+  end
 end
