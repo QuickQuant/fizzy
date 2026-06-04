@@ -47,6 +47,19 @@ class Card::PipelineMetadataPatchTest < ActiveSupport::TestCase
     )
   end
 
+  test "metadata_patch touches updated_at for JSON fragment cache invalidation" do
+    card = cards(:logo)
+    card.update!(pipeline_metadata: { "wave" => 1 }, metadata_version: 1)
+    card.update_column(:updated_at, 1.hour.ago)
+    previous_updated_at = card.reload.updated_at
+
+    assert card.metadata_patch({ "commit_hash" => "abc123" }, expected_version: 1)
+
+    card.reload
+    assert_equal 2, card.metadata_version
+    assert_operator card.updated_at, :>, previous_updated_at
+  end
+
   # Cross-language merge contract: shared fixtures with Python MCP
   FIXTURES_PATH = File.expand_path("../../fixtures/metadata_merge_fixtures.json", __dir__)
   raise "Missing shared merge contract fixtures at #{FIXTURES_PATH}" unless File.exist?(FIXTURES_PATH)

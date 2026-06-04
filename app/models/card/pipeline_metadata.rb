@@ -7,7 +7,8 @@ module Card::PipelineMetadata
 
     updated = self.class.where(id: id, metadata_version: expected_version).update_all(
       pipeline_metadata: merged_metadata,
-      metadata_version: expected_version + 1
+      metadata_version: expected_version + 1,
+      updated_at: Time.current
     )
 
     return false unless updated == 1
