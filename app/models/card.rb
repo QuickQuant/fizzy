@@ -1,7 +1,7 @@
 class Card < ApplicationRecord
   include Accessible, Assignable, Attachments, Broadcastable, Closeable, Colored, Commentable,
-    Entropic, Eventable, Exportable, Golden, Mentions, Multistep, PipelineMetadata, Pinnable, Postponable, Promptable,
-    Readable, Searchable, Stallable, Statuses, Storage::Tracked, Taggable, Triageable, Watchable
+    Entropic, Eventable, Exportable, Golden, Linkable, Mentions, Multistep, PipelineMetadata, Pinnable, Postponable,
+    Promptable, Readable, Searchable, Stallable, Statuses, Storage::Tracked, Taggable, Triageable, Watchable
 
   belongs_to :account, default: -> { board.account }
   belongs_to :board
@@ -23,7 +23,7 @@ class Card < ApplicationRecord
   scope :chronologically,         -> { order created_at:     :asc,  id: :asc  }
   scope :latest,                  -> { order last_active_at: :desc, id: :desc }
   scope :with_users,              -> { preload(creator: [ :avatar_attachment, :account ], assignees: [ :avatar_attachment, :account ]) }
-  scope :preloaded,               -> { with_users.preload(:column, :tags, :steps, :closure, :goldness, :activity_spike, :image_attachment, reactions: :reacter, board: [ :entropy, :columns ], not_now: [ :user ]).with_rich_text_description_and_embeds }
+  scope :preloaded,               -> { with_users.preload(:column, :tags, :steps, :closure, :goldness, :activity_spike, :image_attachment, :outbound_links, :inbound_links, reactions: :reacter, board: [ :entropy, :columns ], not_now: [ :user ]).with_rich_text_description_and_embeds }
 
   scope :indexed_by, ->(index) do
     case index

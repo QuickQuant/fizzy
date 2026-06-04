@@ -97,6 +97,7 @@ Rails.application.routes.draw do
       resource :self_assignment, only: :create
       resources :steps
       resources :taggings
+      resources :links, only: %i[ index create destroy ]
 
       resources :comments do
         resources :reactions, module: :comments
