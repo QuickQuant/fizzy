@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_04_03_110000) do
+ActiveRecord::Schema[8.2].define(version: 2026_06_04_190000) do
   create_table "accesses", id: :uuid, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.datetime "accessed_at"
     t.uuid "account_id", null: false
@@ -241,6 +241,18 @@ ActiveRecord::Schema[8.2].define(version: 2026_04_03_110000) do
     t.index ["pipeline_parent_session_id"], name: "index_cards_on_pipeline_parent_session_id"
     t.index ["pipeline_session_id"], name: "index_cards_on_pipeline_session_id"
     t.index ["pipeline_task_id"], name: "index_cards_on_pipeline_task_id"
+  end
+
+  create_table "card_links", id: :uuid, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.uuid "account_id", null: false
+    t.datetime "created_at", null: false
+    t.uuid "from_card_id", null: false
+    t.string "link_type", null: false
+    t.uuid "to_card_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "from_card_id", "link_type"], name: "index_card_links_on_account_from_type"
+    t.index ["account_id", "to_card_id", "link_type"], name: "index_card_links_on_account_to_type"
+    t.index ["from_card_id", "to_card_id", "link_type"], name: "index_card_links_on_from_to_type_unique", unique: true
   end
 
   create_table "closers_filters", id: false, charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
