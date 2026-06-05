@@ -11,7 +11,7 @@ class Account::DataTransfer::RecordSet
   def initialize(account:, model:, attributes: nil, importable_model_names: nil)
     @account = account
     @model = model
-    @attributes = (attributes || model.column_names).map(&:to_s)
+    @attributes = (attributes || insertable_column_names).map(&:to_s)
     @importable_model_names = importable_model_names || [ model.name ]
   end
 
@@ -62,6 +62,19 @@ class Account::DataTransfer::RecordSet
 
     def records
       model.where(account_id: account.id)
+    end
+
+    # Generated/virtual columns (e.g. the pipeline_* columns derived from
+    # pipeline_metadata) are computed by the database and rejected by INSERT.
+    # Excluding them from the importable attribute set keeps insert_all! from
+    # writing a generated column while preserving the columns and their
+    # generation semantics.
+    def insertable_column_names
+      model.columns.reject { |column| generated_column?(column) }.map(&:name)
+    end
+
+    def generated_column?(column)
+      column.respond_to?(:virtual?) && column.virtual?
     end
 
     def export_record(record)
