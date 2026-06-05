@@ -51,6 +51,21 @@ class Account::DataTransfer::RecordSetTest < ActiveSupport::TestCase
     end
   end
 
+  test "default importable attributes exclude generated columns" do
+    record_set = Account::DataTransfer::RecordSet.new(account: importing_account, model: Card)
+
+    generated = Card.columns.select { |c| c.respond_to?(:virtual?) && c.virtual? }.map(&:name)
+    assert_includes generated, "pipeline_card_type", "expected cards to have a generated pipeline_card_type column"
+
+    generated.each do |column|
+      assert_not_includes record_set.attributes, column,
+        "generated column #{column} must not be in the importable attribute set (cannot INSERT into a generated column)"
+    end
+
+    assert_includes record_set.attributes, "pipeline_metadata",
+      "the real pipeline_metadata column backing the generated columns must remain importable"
+  end
+
   private
     def importing_account
       @importing_account ||= Account.create!(name: "Importing Account", external_account_id: 99999999)
